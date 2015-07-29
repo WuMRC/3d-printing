@@ -1,0 +1,93 @@
+%% Be careful, this first bit clears the workspace completely
+clear, close, clc
+
+%% Select image of interest
+[filename, pathname] = uigetfile('*.*','Pick a file');
+addpath(genpath(pathname));
+cd(pathname)
+
+% You could expand this to go through a whole folder for a more automated
+% analysis, but for now let's just give you manual baby steps.
+
+%% Display image and select a region of interest
+image = imadjust(rgb2gray(imread(filename)));
+figure, imshow(image)
+
+% Overlays a box, you select a region, double click to use that ROI
+hBox = imrect;
+roiPosition = wait(hBox);
+
+% Get that box's coordinates and crop image accordingly
+indRowROI = round([roiPosition(2), roiPosition(2), ...
+    roiPosition(2)+roiPosition(4), roiPosition(2)+roiPosition(4)]);
+indColROI = round([roiPosition(1), roiPosition(1)+roiPosition(3), ...
+    roiPosition(1)+roiPosition(3), roiPosition(1)]);
+close
+
+imageROI = image(indRowROI(1):indRowROI(3),indColROI(1):indColROI(2));
+
+% Display image you will now be working with
+imshow(imageROI)
+
+%% Real basic profile detection
+[imageHeight, imageWidth] = size(imageROI);
+
+% Threshold the image, turn it into a binary image
+graythreshScaling = 1.2;
+imageROI_BW = im2bw(imageROI,graythresh(imageROI)*graythreshScaling);
+
+% Go through each row, find the first and last black pixels
+for indRow = 1:imageHeight
+    row = imageROI_BW(indRow,:);
+    wallLeft(indRow) = find(row==0,1,'first');
+    wallRight(indRow) = find(row==0,1,'last');
+end
+
+MM_PER_PIXEL = 0.5/(2016-1531);
+width = (wallRight-wallLeft)*MM_PER_PIXEL;
+
+plot(width,'ko')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%% Single threshold - Don't need this, just for demonstration
+thresh = graythresh(image);
+
+levelPercent = 0.1:0.1:2;
+
+figure('units','normalized','outerposition',[0 0 1 1])
+for indImage = 1:length(levelPercent)
+    imageBW = im2bw(image,thresh*levelPercent(indImage));
+    subplot(4,5,indImage), imshow(imageBW)
+    title(strcat(num2str(levelPercent(indImage)*100),'% of graythresh'))
+end
+
+%% Multithreshold - Don't need this, just for demonstration
+
+threshLevel = 1:12;
+figure('units','normalized','outerposition',[0 0 1 1])
+for indThresh = 1:length(threshLevel)
+    thresh = multithresh(image,threshLevel(indThresh));
+    Iseg = imquantize(image,thresh);
+    RGB = label2rgb(Iseg);
+    subplot(3,4,indThresh), imshow(RGB)
+    title(strcat(num2str(indThresh),' threshold levels'))
+end
+
+
+%%
