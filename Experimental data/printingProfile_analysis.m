@@ -49,6 +49,10 @@ width = (wallRight-wallLeft)*MM_PER_PIXEL;
 plot(width,'ko')
 
 
+% Show the wall edges
+figure
+hold on, plot(wallLeft,'k'), plot(wallRight,'k');
+
 
 
 
