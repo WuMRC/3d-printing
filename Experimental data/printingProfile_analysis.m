@@ -60,8 +60,62 @@ hold on, plot(wallLeft,'k'), plot(wallRight,'k');
 
 
 
+%% Fitting a circle to single wall edges demonstration
+indicesR = 1:246;
+wR = wallRight(indicesR);
+
+[xc,yc,rFit] = circfit(indicesR,wR);
+
+theta = 0:pi/64:pi;
+xFit = xc + rFit*cos(theta);
+yFit = yc + rFit*sin(theta);
+
+subplot(2,1,1), plot(xFit,yFit,'r-','LineWidth',2);
+hold on, plot(indicesR,wR,'ko','LineWidth',2)
+title('Right wall, circle fit')
+set(gca,'FontSize',16)
 
 
+indicesL = 1:233;
+wL = wallLeft(indicesL);
+
+[xc,yc,rFit] = circfit(indicesL,wL);
+
+theta = pi:pi/64:2*pi;
+xFit = xc + rFit*cos(theta);
+yFit = yc + rFit*sin(theta);
+
+subplot(2,1,2)
+plot(xFit,yFit,'r-','LineWidth',2);
+hold on, plot(indicesL,wL,'ko','LineWidth',2)
+title('Left wall, circle fit')
+set(gca,'FontSize',16)
+
+
+%% Fitting an eclipse to both wall edges demonstration
+[semimajor_axis, semiminor_axis, x0, y0, phi] = ellipse_fit(inds,edges);
+
+xc = x0;
+yc = y0;
+a = semimajor_axis;
+b = semiminor_axis;
+alpha = phi;
+
+t = 0:pi/200:2*pi;
+
+xu = a*cos(t);
+yv = b*sin(t);
+
+xx = xu*cos(-alpha) - yv*sin(-alpha);
+yy = xu*sin(-alpha) + yv*cos(-alpha);
+
+x = xc + xx; 
+y = yc + yy;
+
+plot(x,y,'r-','LineWidth',2)
+hold on, plot(inds,edges,'ko','LineWidth',2)
+title('Fitting an Ellipse')
+set(gca,'FontSize',16)
 
 
 
