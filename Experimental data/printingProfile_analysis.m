@@ -33,7 +33,9 @@ imshow(imageROI)
 [imageHeight, imageWidth] = size(imageROI);
 
 % Threshold the image, turn it into a binary image
-graythreshScaling = 1.2;
+% Suitable GTS: H0.26(0.7), H0.25(0.7), H0.24(0.8),H0.23(0.8), H0.22(1), H0.21(0.8)
+% H0.2(0.9)
+graythreshScaling = 0.7;
 imageROI_BW = im2bw(imageROI,graythresh(imageROI)*graythreshScaling);
 
 % Go through each row, find the first and last black pixels
@@ -46,19 +48,28 @@ end
 MM_PER_PIXEL = 0.5/(2016-1531);
 width = (wallRight-wallLeft)*MM_PER_PIXEL;
 
-plot(width,'ko')
+%generate length array accordingly
+length=0:1:(length(width)-1);
+length=length*MM_PER_PIXEL;
 
+plot(length,width,'k')
+title('Width Vs. Length');
 
 % Show the wall edges
 figure
-hold on, plot(wallLeft,'k'), plot(wallRight,'k');
+%hold on, plot(length,wallLeft,'k'), plot(length,wallRight,'k');
+plot(length,wallLeft,'r',length,wallRight,'b');
+legend('Wallleft','Wallright');
+title('Wallleft and Wallright plot');
 
 
-
-
-
-
-
+% Calculate the area of the black pixels
+%Area = 0; 
+%for indRow = 1:imageHeight
+%    row = imageROI_BW(inRow,:);
+%    Area=Area+(wallRight(indRow)-wallLeft(indRow));
+%end
+%Area=Area*MM_PER_PIXEL^2;
 
 %% Fitting a circle to single wall edges demonstration
 indicesR = 1:246;
@@ -123,7 +134,9 @@ set(gca,'FontSize',16)
 
 
 
+%{
 %% Single threshold - Don't need this, just for demonstration
+
 thresh = graythresh(image);
 
 levelPercent = 0.1:0.1:2;
@@ -149,3 +162,4 @@ end
 
 
 %%
+%}
