@@ -35,7 +35,7 @@ imshow(imageROI)
 % Threshold the image, turn it into a binary image
 % Suitable GTS: H0.26(0.7), H0.25(0.7), H0.24(0.8),H0.23(0.8), H0.22(1), H0.21(0.8)
 % H0.2(0.9)
-graythreshScaling = 0.7;
+graythreshScaling = 0.8;
 imageROI_BW = im2bw(imageROI,graythresh(imageROI)*graythreshScaling);
 
 % Go through each row, find the first and last black pixels
@@ -57,19 +57,21 @@ title('Width Vs. Length');
 
 % Show the wall edges
 figure
+Con_WallLeft=wallLeft*MM_PER_PIXEL;
+Con_WallRight=wallRight*MM_PER_PIXEL;
 %hold on, plot(length,wallLeft,'k'), plot(length,wallRight,'k');
-plot(length,wallLeft,'r',length,wallRight,'b');
+plot(length,Con_WallLeft,'r',length,Con_WallRight,'b');
 legend('Wallleft','Wallright');
 title('Wallleft and Wallright plot');
 
 
 % Calculate the area of the black pixels
-%Area = 0; 
-%for indRow = 1:imageHeight
-%    row = imageROI_BW(inRow,:);
-%    Area=Area+(wallRight(indRow)-wallLeft(indRow));
-%end
-%Area=Area*MM_PER_PIXEL^2;
+%require user input of the current LayerHeight in the unit of mm.
+prompt = 'What is the current LayerHeight in mm?';
+LayerHeight = input(prompt);
+[Average_area, StdDeviation] = get_averageArea(imageHeight, wallLeft, wallRight, LayerHeight);
+
+
 
 %% Fitting a circle to single wall edges demonstration
 indicesR = 1:246;
@@ -81,6 +83,7 @@ theta = 0:pi/64:pi;
 xFit = xc + rFit*cos(theta);
 yFit = yc + rFit*sin(theta);
 
+figure
 subplot(2,1,1), plot(xFit,yFit,'r-','LineWidth',2);
 hold on, plot(indicesR,wR,'ko','LineWidth',2)
 title('Right wall, circle fit')
